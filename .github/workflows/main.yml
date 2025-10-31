@@ -1,0 +1,31 @@
+name: Publish NPM Package (using Bun)
+on:
+  push:
+    branches:
+      - main
+  release:
+    types: [created]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+          
+      - name: Install Dependencies
+        run: bun install
+        
+      - name: Build and Test
+        run: |
+          bun run build
+          bun run test 
+          
+      - name: Publish to NPM
+        run: bun publish --tag latest
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
