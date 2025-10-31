@@ -1,0 +1,45 @@
+{
+  "name": "liteapi-map-sdk",
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": " vite build && tsc -p tsconfig.build.json",
+    "preview": "vite preview",
+    "test": "vitest",
+    "coverage": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "jsdom": "^27.0.1",
+    "typescript": "~5.9.3",
+    "vite": "npm:rolldown-vite@7.1.14",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^4.0.5"
+  },
+  "overrides": {
+    "vite": "npm:rolldown-vite@7.1.14"
+  },
+  "dependencies": {
+    "mapbox-gl": "^3.16.0"
+  },
+  "main": "dist/liteapi-map-sdk.umd.js",
+  "module": "dist/liteapi-map-sdk.es.js",
+  "types": "dist/types/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "map",
+    "liteapi",
+    "sdk"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lemoneey/liteapi-map-sdk.git"
+  },
+  "author": "Nursultan G",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
+}
