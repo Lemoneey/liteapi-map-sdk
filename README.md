@@ -17,7 +17,7 @@ An embeddable maps experience that renders LiteAPI hotel data on top of a Mapbox
 ### Installation
 
 ```bash
-npm install
+npm install liteapi-map-sdk
 ```
 
 ## Using the SDK
