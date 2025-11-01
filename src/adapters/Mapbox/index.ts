@@ -15,14 +15,14 @@ const HOTEL_PRICES_ID = "hotel-prices";
 const HOTEL_HEATMAP_ID = "hotel-heatmap";
 
 export class MapboxAdapter implements MapAdapter {
-  private selector: string;
   private options: MapboxAdapterOptions = {};
   private loadingContainer?: HTMLDivElement;
   private mapContainer?: HTMLElement;
+  private mapContainerSelector: string;
   private map: mapboxgl.Map | null = null;
 
   constructor(selector: string, options?: MapboxAdapterOptions) {
-    this.selector = selector;
+    this.mapContainerSelector = selector;
     this.options = options || {};
   }
 
@@ -40,10 +40,14 @@ export class MapboxAdapter implements MapAdapter {
   }
 
   private mountMap(viewConfig: ViewConfig) {
-    const container = document.querySelector<HTMLElement>(this.selector);
+    const container = document.querySelector<HTMLElement>(
+      this.mapContainerSelector
+    );
 
     if (!container) {
-      throw new Error(`Container with id ${this.selector} not found`);
+      throw new Error(
+        `Container with id ${this.mapContainerSelector} not found`
+      );
     }
 
     this.mapContainer = container;
@@ -261,9 +265,11 @@ export class MapboxAdapter implements MapAdapter {
       const zoom = thisMap.getZoom();
       const opacity = this.calculateMarkerOpacity(zoom);
 
-      document.querySelectorAll<HTMLElement>(".popup").forEach((el) => {
-        updateElementOpacity(el, opacity);
-      });
+      document
+        .querySelectorAll<HTMLElement>(`${this.mapContainerSelector} .popup`)
+        .forEach((el) => {
+          updateElementOpacity(el, opacity);
+        });
     });
   }
 
