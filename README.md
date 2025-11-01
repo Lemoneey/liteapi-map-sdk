@@ -32,6 +32,7 @@ npm install
 
 ```ts
 import { LiteAPI } from "liteapi-map-sdk";
+import "liteapi-map-sdk/dist/liteapi-map-sdk.css";
 
 LiteAPI.Map.init({
   selector: "#app",
