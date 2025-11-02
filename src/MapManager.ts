@@ -54,8 +54,8 @@ export class MapManager {
           };
         });
 
-        this.mapAdapter.setMarkers(hotelRatesWithGeneratedLocation);
         this.mapAdapter.setHeatmap(hotelRatesWithGeneratedLocation);
+        this.mapAdapter.setMarkers(hotelRatesWithGeneratedLocation);
       });
     });
 
