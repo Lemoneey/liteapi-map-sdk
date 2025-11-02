@@ -20,6 +20,7 @@ export class MapboxAdapter implements MapAdapter {
   private mapContainer?: HTMLElement;
   private mapContainerSelector: string;
   private map: mapboxgl.Map | null = null;
+  private heatmapEnabled: boolean = false;
 
   constructor(selector: string, options?: MapboxAdapterOptions) {
     this.mapContainerSelector = selector;
@@ -45,9 +46,8 @@ export class MapboxAdapter implements MapAdapter {
     );
 
     if (!container) {
-      throw new Error(
-        `Container with id ${this.mapContainerSelector} not found`
-      );
+      console.error(`Container with id ${this.mapContainerSelector} not found`);
+      return;
     }
 
     this.mapContainer = container;
@@ -72,6 +72,7 @@ export class MapboxAdapter implements MapAdapter {
   public setHeatmap(hotels: HotelData[]) {
     if (!this.isMap()) return;
     const map = this.map!;
+    this.heatmapEnabled = true;
 
     const features = hotels.map((hotel) => {
       return {
@@ -197,26 +198,13 @@ export class MapboxAdapter implements MapAdapter {
 
     if (!thisMap.getLayer(HOTEL_HEATMAP_ID)) return;
 
+    this.heatmapEnabled = flag;
+    this.updateMarkersOpacity();
     thisMap.setLayoutProperty(
       HOTEL_HEATMAP_ID,
       "visibility",
       flag ? "visible" : "none"
     );
-  }
-
-  private calculateMarkerOpacity(zoomLevel: number) {
-    const startFade = 11;
-    const endFade = 13;
-
-    let opacity = 1;
-
-    if (zoomLevel < startFade) {
-      opacity = 0;
-    } else if (zoomLevel < endFade) {
-      opacity = (zoomLevel - startFade) / (endFade - startFade);
-    }
-
-    return opacity;
   }
 
   private initLoadingIndicator() {
@@ -238,21 +226,55 @@ export class MapboxAdapter implements MapAdapter {
     this.loadingContainer!.style.display = flag ? "block" : "none";
   }
 
+  private calculateMarkerOpacity() {
+    let opacity = 1;
+
+    if (!this.heatmapEnabled) {
+      return opacity;
+    }
+
+    if (!this.isMap()) return;
+    const thisMap = this.map!;
+
+    const zoomLevel = thisMap.getZoom();
+
+    const startFade = 11;
+    const endFade = 13;
+
+    if (zoomLevel < startFade) {
+      opacity = 0;
+    } else if (zoomLevel < endFade) {
+      opacity = (zoomLevel - startFade) / (endFade - startFade);
+    }
+
+    return opacity;
+  }
+
+  private updateElementOpacity(el: HTMLElement, opacity?: number) {
+    if (opacity === undefined) return;
+    el.style.opacity = opacity.toString();
+    el.style.pointerEvents = opacity > 0.5 ? "auto" : "none";
+  }
+
+  private updateMarkersOpacity() {
+    const opacity = this.calculateMarkerOpacity();
+    document
+      .querySelectorAll<HTMLElement>(`${this.mapContainerSelector} .popup`)
+      .forEach((el) => {
+        this.updateElementOpacity(el, opacity);
+      });
+  }
+
   public setMarkers(hotels: HotelData[]) {
     if (!this.isMap()) return;
 
     const thisMap = this.map!;
 
-    const updateElementOpacity = (el: HTMLElement, opacity: number) => {
-      el.style.opacity = opacity.toString();
-      el.style.pointerEvents = opacity > 0.5 ? "auto" : "none";
-    };
-
     hotels.forEach((hotel) => {
       const popup = renderPopup(hotel, this.options?.deepLinkConfig);
-      const opacity = this.calculateMarkerOpacity(thisMap.getZoom());
+      const opacity = this.calculateMarkerOpacity();
 
-      updateElementOpacity(popup.querySelector(".popup")!, opacity);
+      this.updateElementOpacity(popup.querySelector(".popup")!, opacity);
 
       new mapboxgl.Marker({
         element: popup,
@@ -261,16 +283,7 @@ export class MapboxAdapter implements MapAdapter {
         .addTo(thisMap);
     });
 
-    thisMap.on("zoom", () => {
-      const zoom = thisMap.getZoom();
-      const opacity = this.calculateMarkerOpacity(zoom);
-
-      document
-        .querySelectorAll<HTMLElement>(`${this.mapContainerSelector} .popup`)
-        .forEach((el) => {
-          updateElementOpacity(el, opacity);
-        });
-    });
+    thisMap.on("zoom", this.updateMarkersOpacity.bind(this));
   }
 
   public async render(viewConfig: ViewConfig): Promise<void> {

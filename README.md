@@ -44,13 +44,13 @@ LiteAPI.Map.init({
 `init` returns a `MapManager` instance that you can use to toggle layers:
 
 ```ts
-const mapManager = LiteAPI.Map.init({
+const map = LiteAPI.Map.init({
   selector: "#app",
   placeId: "PLACE_ID_FROM_LITEAPI",
   proxyDomain: "proxy.example.com",
 });
 
-mapManager.toggleMapHeatmap(true);
+map.toggleMapHeatmap(true);
 ```
 
 ### Configuration Reference
