@@ -1,5 +1,4 @@
 import type { MapAdapter } from "./adapters/types";
-import type { LiteApiClient } from "./services/LiteApi";
 import type { ApiClient } from "./services/types";
 import { generateHotelLngLat } from "./utils";
 
@@ -8,7 +7,7 @@ export class MapManager {
   private apiClient: ApiClient;
   private isInitialized = false;
 
-  constructor(adapter: MapAdapter, apiClient: LiteApiClient) {
+  constructor(adapter: MapAdapter, apiClient: ApiClient) {
     this.mapAdapter = adapter;
     this.apiClient = apiClient;
   }

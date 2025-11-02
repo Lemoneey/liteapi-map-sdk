@@ -1,9 +1,10 @@
 import type { HotelData, ViewConfig } from "../../adapters/types";
+import { ApiClient } from "../types";
 import { normalizePlaceData, normalizeRateData } from "./normalizers";
 import type { ApiConfig } from "./types";
 import { mergeHotels } from "./utils";
 
-export class LiteApiClient {
+export class LiteApiClient implements ApiClient {
   private proxyDomain: string;
   private config: Partial<ApiConfig> = {};
 
